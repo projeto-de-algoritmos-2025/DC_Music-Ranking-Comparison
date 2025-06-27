@@ -1,7 +1,7 @@
 import random
 
 from algoritmo_contagem import contar_inversoes
-from dados import RANKING_BRASIL_TOP_15
+from scraper_kworb import raspar_top_15
 
 def apresentar_e_obter_ranking_usuario(lista_de_musicas):
 
@@ -60,15 +60,19 @@ def iniciar_programa():
     """
     Função principal que orquestra a execução da aplicação.
     """
-    # obter o ranking do usuário.
-    ranking_do_usuario = apresentar_e_obter_ranking_usuario(RANKING_BRASIL_TOP_15)
+    # chama o scrapeer
+    ranking_brasil_musicas = raspar_top_15()
+
+    if not ranking_brasil_musicas or len(ranking_brasil_musicas) < 15:
+        print("\nNão foi possível obter o ranking do site.")
+        return
+
+    ranking_do_usuario = apresentar_e_obter_ranking_usuario(ranking_brasil_musicas)
     
     if ranking_do_usuario:
-        
         num_inversoes = contar_inversoes(ranking_do_usuario)
-        
-        # result
-        analisar_e_mostrar_resultado(num_inversoes, len(RANKING_BRASIL_TOP_15))
+        analisar_e_mostrar_resultado(num_inversoes, len(ranking_brasil_musicas))
+
 
 
 if __name__ == "__main__":
