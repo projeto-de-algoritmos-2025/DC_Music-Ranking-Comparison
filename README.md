@@ -17,12 +17,59 @@ Este projeto tem como objetivo apresentar o conceito de dividir e conquistar den
 Adicione 3 ou mais screenshots do projeto em funcionamento.
 
 ## Instalação 
-**Linguagem**: Python=3.0<br>
-**Framework**: (caso exista)<br>
-Descreva os pré-requisitos para rodar o seu projeto e os comandos necessários.
+**Linguagem**: Python<br>
 
 ## Uso 
-Explique como usar seu projeto caso haja algum passo a passo após o comando de execução.
+
+#### Baixando o python
+
+Para Utilizar a aplicação, primeiramente, vamos verificar se o python está instalado com o comando:
+
+```bash
+python --version
+```
+Se aparecer algo como:
+
+```bash
+Python 3.12.9
+```
+
+Podemos prosseguir. Caso não, você pode consultar esse [guia oficial ](https://wiki.python.org/moin/BeginnersGuide/Download) do python e realizar a instalação.
+
+#### Clonando o repositório
+
+Para rodar a aplicação na sua máquina, primeiro vamo clonar o repositório. Vá ao diretório que preferir, onde os arquivos do repositório serão baixados, e execute o seguinte comando:
+
+```bash
+git clone https://github.com/projeto-de-algoritmos-2025/DC_Music-Ranking-Comparison.git
+
+```
+
+Agora entre na pasta do projeto com o seguinte comando:
+
+
+```bash
+cd DC_Music-Ranking-Comparison/
+
+```
+
+#### Instalando as dependências
+
+Já dentro da pasta do projeto e com o python devidamente instalado, vamos instalar as dependências necessárias que a aplicação requer. Abaixo cole este comando no terminal para fazer a instalação:
+
+```bash
+pip install -r requirements.txt
+
+```
+
+#### Executando a aplicação
+
+Com as dependências baixadas, vamos executar a aplicação localmente, com o comando:
+
+```bash
+streamlit run main.py
+
+```
 
 ## Outros 
 Quaisquer outras informações sobre seu projeto podem ser descritas abaixo.

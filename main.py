@@ -1,79 +1,107 @@
-import random
-
+import streamlit as st
 from algoritmo_contagem import contar_inversoes
 from scraper_kworb import raspar_top_15
 
-def apresentar_e_obter_ranking_usuario(lista_de_musicas):
+# página inicial
+st.set_page_config(
+    page_title="Music Ranking Comparison",
+    page_icon="🎵",
+    layout="centered"
+)
 
-    print("--- Analisador de Gosto Musical: Meu Spotify Vibe ---")
-    print("Abaixo estão as 15 músicas mais tocadas no Brasil.")
-    print("Ordene-as de acordo com a sua preferência!\n")
+# Aqui garante que o scraping só será feito uma vez
+@st.cache_data
+def carregar_dados():
+    """Carrega os dados do ranking uma única vez."""
+    return raspar_top_15()
 
-    # Mapeia cada música ao seu número (posição)
-    mapa_musica_para_posicao = {musica: i + 1 for i, musica in enumerate(lista_de_musicas)}
+def analisar_similaridade(ranking_usuario, ranking_oficial):
+    """Calcula a similaridade e retorna os resultados formatados."""
+    total_de_itens = len(ranking_oficial)
     
-    musicas_para_exibir = list(lista_de_musicas)
-    random.shuffle(musicas_para_exibir) # Embaralha para não enviesar a resposta do usuário
-
-    for musica in musicas_para_exibir:
-        posicao_oficial = mapa_musica_para_posicao[musica]
-        print(f"{posicao_oficial}: {musica}")
-
-    print("\nDigite os números de 1 a 15 na sua ordem de preferência, separados por espaço.")
-    ranking_usuario_str = input("Sua ordem: ")
-
-    try:
-        ranking_numerico = [int(num) for num in ranking_usuario_str.split()]
-        
-        # Validacaoo simples 
-        if len(ranking_numerico) != len(lista_de_musicas) or len(set(ranking_numerico)) != len(lista_de_musicas):
-            print("\nErro: Entrada inválida. Por favor, insira todos os 15 números de 1 a 15, sem repetição.")
-            return None
-            
-        return ranking_numerico
-    except ValueError:
-        print("\nErro: Entrada inválida. Use apenas números separados por espaço.")
-        return None
-
-def analisar_e_mostrar_resultado(inversoes, total_de_itens):
-    """
-    Calcula a similaridade e exibe o feedback final para o usuário.
-    """
-    # O pior caso (ranking totalmente invertido) tem n*(n-1)/2 inversões.
-    maximo_de_inversoes = total_de_itens * (total_de_itens - 1) / 2
+    # 1. Mapear cada música para sua posição oficial no ranking
+    mapa_posicao_oficial = {musica: i + 1 for i, musica in enumerate(ranking_oficial)}
     
-    # Converte o número de inversões em uma porcentagem de similaridade.
-    similaridade = 100 * (1 - (inversoes / maximo_de_inversoes))
+    # 2. Converter o ranking do usuário (lista de strings) para uma lista de números
+    ranking_numerico_usuario = [mapa_posicao_oficial[musica] for musica in ranking_usuario]
+    
+    # 3. Calcular as inversões
+    inversoes = contar_inversoes(ranking_numerico_usuario)
+    
+    # 4. Calcular o índice de similaridade
+    max_inversoes = total_de_itens * (total_de_itens - 1) / 2
+    similaridade_percentual = 100 * (1 - (inversoes / max_inversoes))
+    
+    return inversoes, similaridade_percentual
 
-    print("\n--- Resultado da Análise ---")
-    print(f"Número de 'discordâncias' (inversões) com o ranking Brasil: {inversoes}")
-    print(f"Seu gosto musical é {similaridade:.2f}% similar ao Top 15 do Brasil!")
-
+# Feedback da similaridade do gosto musical do usuário.
+def get_feedback_similaridade(similaridade):
+    """Retorna uma mensagem amigável baseada na porcentagem de similaridade."""
     if similaridade >= 80:
-        print("Veredito: Você está super em alta! Seu gosto é totalmente mainstream.")
+        return "Veredito: Gêmeos musicais! 🎶 Você está super alinhado com as tendências do Brasil.", "success"
     elif similaridade >= 50:
-        print("Veredito: Você tem um gosto equilibrado, curte os hits mas tem suas próprias preferências.")
+        return "Veredito: Bom gosto! Você curte os hits, mas também tem suas próprias pérolas escondidas.", "info"
+    elif similaridade >= 20:
+        return "Veredito: Alma alternativa! Seu gosto é único e se destaca da multidão.", "warning"
     else:
-        print("Veredito: Você definitivamente tem um gosto alternativo e único!")
+        return "Veredito: Totalmente contra a maré! Você é um verdadeiro vanguardista musical.", "error"
 
-def iniciar_programa():
-    """
-    Função principal que orquestra a execução da aplicação.
-    """
-    # chama o scrapeer
-    ranking_brasil_musicas = raspar_top_15()
 
-    if not ranking_brasil_musicas or len(ranking_brasil_musicas) < 15:
-        print("\nNão foi possível obter o ranking do site.")
-        return
+# Criação da interface
+st.title("🎵 Music Match")
+st.markdown("### Compare seu gosto musical com o Top 15 do Brasil!")
+st.write("---")
 
-    ranking_do_usuario = apresentar_e_obter_ranking_usuario(ranking_brasil_musicas)
+# Carrega os dados usando a função com cache
+ranking_oficial = carregar_dados()
+
+if not ranking_oficial:
+    st.error("Não foi possível carregar o ranking do kworb.net. Por favor, tente recarregar a página mais tarde.")
+else:
+    st.info("**Instrução:** Clique na caixa abaixo e selecione as músicas na sua ordem de preferência, da 1ª à 15ª.")
     
-    if ranking_do_usuario:
-        num_inversoes = contar_inversoes(ranking_do_usuario)
-        analisar_e_mostrar_resultado(num_inversoes, len(ranking_brasil_musicas))
+    #Estrutura que permite o usuário selecionar as músicas que ele queira.
+    ranking_usuario = st.multiselect(
+        label="**Monte seu ranking aqui:**",
+        options=ranking_oficial,
+        placeholder="Selecione sua música favorita...",
+        label_visibility="visible"
+    )
 
 
+    # Apresenta ao usuário a ordem que ele selecionou.
+    if ranking_usuario:
+        st.markdown("---")
+        st.write("**Sua ordem atual:**")
+        # O 'enumerate' cria a numeração 1º, 2º, 3º...
+        for i, musica in enumerate(ranking_usuario):
+            st.markdown(f"&nbsp;&nbsp;&nbsp;`{i+1}º` - {musica}")
 
-if __name__ == "__main__":
-    iniciar_programa()
+    st.write("---")
+    
+    # botão para iniciar o cálculo
+    if st.button("Calcular Similaridade", type="primary"):
+        if len(ranking_usuario) != len(ranking_oficial):
+            st.warning(f"Por favor, selecione todas as {len(ranking_oficial)} músicas para fazer a comparação.")
+        else:
+            
+            with st.spinner('Analisando as vibes... 🤖'):
+                inversoes, similaridade = analisar_similaridade(ranking_usuario, ranking_oficial)
+                
+                # aqui mostra resultados
+                st.subheader("🎉 Seu Resultado!")
+
+                col1, col2 = st.columns(2)
+                col1.metric(label="Índice de Similaridade", value=f"{similaridade:.1f}%")
+                col2.metric(label="Nº de 'Discordâncias' (inversões)", value=f"{inversoes}")
+
+                feedback_texto, feedback_tipo = get_feedback_similaridade(similaridade)
+                
+                if feedback_tipo == "success":
+                    st.success(feedback_texto)
+                elif feedback_tipo == "info":
+                    st.info(feedback_texto)
+                elif feedback_tipo == "warning":
+                    st.warning(feedback_texto)
+                else:
+                    st.error(feedback_texto)
