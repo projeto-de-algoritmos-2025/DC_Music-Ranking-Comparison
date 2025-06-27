@@ -1,6 +1,7 @@
 import streamlit as st
 from algoritmo_contagem import contar_inversoes
 from scraper_kworb import raspar_top_15
+import random
 
 # página inicial
 st.set_page_config(
@@ -18,7 +19,6 @@ def carregar_dados():
 def analisar_similaridade(ranking_usuario, ranking_oficial):
     """Calcula a similaridade e retorna os resultados formatados."""
     total_de_itens = len(ranking_oficial)
-    
     # 1. Mapear cada música para sua posição oficial no ranking
     mapa_posicao_oficial = {musica: i + 1 for i, musica in enumerate(ranking_oficial)}
     
@@ -48,22 +48,27 @@ def get_feedback_similaridade(similaridade):
 
 
 # Criação da interface
-st.title("🎵 Music Match")
+st.title("🎵 Music Ranking Comparison")
 st.markdown("### Compare seu gosto musical com o Top 15 do Brasil!")
 st.write("---")
 
 # Carrega os dados usando a função com cache
 ranking_oficial = carregar_dados()
 
+
 if not ranking_oficial:
     st.error("Não foi possível carregar o ranking do kworb.net. Por favor, tente recarregar a página mais tarde.")
 else:
     st.info("**Instrução:** Clique na caixa abaixo e selecione as músicas na sua ordem de preferência, da 1ª à 15ª.")
+
+    lista_embaralhada = list(ranking_oficial)
     
+    random.shuffle(lista_embaralhada)
+
     #Estrutura que permite o usuário selecionar as músicas que ele queira.
     ranking_usuario = st.multiselect(
         label="**Monte seu ranking aqui:**",
-        options=ranking_oficial,
+        options=lista_embaralhada,
         placeholder="Selecione sua música favorita...",
         label_visibility="visible"
     )
