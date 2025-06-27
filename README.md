@@ -32,6 +32,10 @@ Este projeto tem como objetivo apresentar o conceito de dividir e conquistar den
 
 ![Tela Inicial](/assets/resultado_final.png)
 
+## Gravação
+
+[Gravação Contagem de Inversões](https://youtu.be/sXo2yIRsnsc)
+
 
 ## Instalação 
 **Linguagem**: Python<br>
