@@ -14,12 +14,29 @@
 Este projeto tem como objetivo apresentar o conceito de dividir e conquistar dentro da abordagem de alguns algoritmos na disciplina de projeto de algoritmos. Nós utilizamos a implementação do algoritmo mergesort, que possui a abordagem de dividir e conquistar. Nesta aplicação é apresentada uma lista com 10 músicas, das top 50 músicas nacionais no aplicativo "spotify" e é requisitado ao usuário para reordenar essa lista e ao final é mostrado o quanto o gosto do usuário é diferente ou não do ranking de músicas nacionais do spotify.
 
 ## Screenshots
-Adicione 3 ou mais screenshots do projeto em funcionamento.
+
+#### Tela Inicial da aplicação
+
+![Tela Inicial](/assets/tela_inicial.png)
+
+#### Seleção das músicas do top list nacional
+
+
+![Tela Inicial](/assets/lista_de_musicas.png)
+
+#### Ordenamento das músicas
+
+![Tela Inicial](/assets/ordenamento.png)
+
+#### Resultado final da similaridade
+
+![Tela Inicial](/assets/resultado_final.png)
+
 
 ## Instalação 
 **Linguagem**: Python<br>
 
-## Uso 
+## Uso
 
 #### Baixando o python
 
